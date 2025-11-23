@@ -32,11 +32,16 @@ mkdir -p packages
 -----------------------------------------
 3. Run it
 
-docker run --privileged --rm -v "${PWD}:/work" \
+docker run --rm \
+  --privileged \
+  -v "${PWD}":/work \
+  -w /work \
   cgr.dev/chainguard/melange:latest \
   build melange.yaml \
-  --arch amd64 \
-  --signing-key melange.rsa
-
+  --arch x86_64 \
+  --signing-key melange.rsa \
+  --keyring-append melange.rsa.pub \
+  --out-dir ./packages
+------------------------------------------
 
 

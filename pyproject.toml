@@ -1,61 +1,14 @@
 [project]
-name = "fastapi-app"
-version = "1.0.0"
-description = "A simple FastAPI application"
-readme = "README.md"
-requires-python = ">=3.12"
-license = { text = "MIT" }
-authors = [
-    { name = "Your Name", email = "your.email@example.com" }
-]
-
-# Define dependencies
+name = "Sample-Fastapi-app"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12.11"
 dependencies = [
-    "fastapi>=0.115.0",
-    "uvicorn[standard]>=0.32.0",
-    "pydantic>=2.9.0",
-    "pydantic-settings>=2.6.0",
-    "python-multipart>=0.0.12",
+    "fastapi>=0.121.0",
+    "pydantic>=2.12.0",
+    "pydantic-settings>=2.11.0",
+    "uvicorn[standard]>=0.38.0",
+    "httpx>=0.28.0",
+    "requests>=2.32.0",
+    "structlog>=25.5.0"
 ]
-
-[project.optional-dependencies]
-# Development dependencies
-dev = [
-    "pytest>=8.3.0",
-    "pytest-asyncio>=0.24.0",
-    "httpx>=0.27.0",
-    "black>=24.8.0",
-    "ruff>=0.7.0",
-]
-
-[build-system]
-requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools]
-packages = [""]
-
-[tool.black]
-line-length = 100
-target-version = ['py312']
-
-[tool.ruff]
-line-length = 100
-target-version = "py312"
-
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-testpaths = ["tests"]
-
-#```
-
-## 3. Project Structure
-
-# Create this directory structure:
-# ```
-# fastapi-app/
-# ├── pyproject.toml
-# ├── melange.yaml          # The Wolfi/Melange configuration we created
-# ├── src/
-# │   └── main.py
-# └── README.md (optional)
