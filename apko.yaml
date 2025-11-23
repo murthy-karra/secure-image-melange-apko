@@ -1,0 +1,61 @@
+# apko.yaml - Configuration for building the final container image
+# This combines Wolfi base packages with your custom FastAPI package
+
+contents:
+  # Package repositories
+  repositories:
+    - https://packages.wolfi.dev/os  # Wolfi's official packages
+    - ./packages                     # Your local packages (from Melange)
+  
+  # Public keys for package verification
+  keyring:
+    - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub  # Wolfi's public key
+    - ./melange.rsa.pub                                    # Your public key
+  
+  # Packages to install in the image
+  packages:
+    # Minimal Wolfi base (just enough to run)
+    - wolfi-base              # Basic Linux utilities
+    - ca-certificates-bundle  # SSL/TLS certificates
+    - python-3.12-base        # Python runtime (no pip/dev tools)
+    - libstdc++              # C++ standard library (needed by Python)
+    - glibc-locale-posix     # Locale support
+    
+    # Your application package
+    - dh-external-rag@local      # @local means it comes from ./packages
+
+# Environment variables
+environment:
+  # Python paths
+  PATH: /app/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  PYTHONUNBUFFERED: "1"           # Immediate output (good for containers)
+  PYTHONDONTWRITEBYTECODE: "1"    # Don't create .pyc files
+  PYTHONPATH: "/app"               # Where to find Python modules
+  
+  # Application settings
+  ENVIRONMENT: "production"
+  PORT: "8000"
+  LOG_LEVEL: "info"
+
+# User configuration (non-root)
+accounts:
+  groups:
+    - groupname: appgroup
+      gid: 1001
+  users:
+    - username: appuser
+      uid: 1001
+      gid: 1001
+      homedir: /home/appuser
+      shell: /bin/false         # Minimal shell (could use /bin/false for no shell)
+  run-as: "appuser:appgroup"
+
+# Container configuration
+work-dir: /app               # Working directory
+entrypoint:
+  command: /app/run.sh      # Script that starts your FastAPI app
+
+# Architecture support
+archs:
+  - x86_64                  # Intel/AMD 64-bit
+  # - aarch64               # ARM64 (uncomment if needed)

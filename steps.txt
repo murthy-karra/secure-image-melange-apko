@@ -1,0 +1,42 @@
+
+1. First generate melange keys 
+
+docker run --rm -v "$(pwd):/work" -w /work cgr.dev/chainguard/melange:v0.34.0 keygen melange.rsa
+
+
+cgr.dev/chainguard/melange:v0.34.0 is an image that was downloaded from chainguard as cgr.dev/chainguard/melange:latest and re-tagged.
+
+
+Run 
+
+docker run --rm -v "$(pwd):/work" -w /work cgr.dev/chainguard/melange:latest version
+docker run --rm -v "$(pwd):/work" -w /work cgr.dev/chainguard/melange:latest-dev version
+
+
+docker tag cgr.dev/chainguard/melange:latest cgr.dev/chainguard/melange:<version>
+
+docker tag cgr.dev/chainguard/melange:latest-dev cgr.dev/chainguard/melange:<version>-dev
+
+docker tag cgr.dev/chainguard/melange:latest-dev cgr.dev/chainguard/melange:<version>-dev
+
+to get latest one. Then get version and retag since you cannot download the tagged images 
+
+
+Save the private key as secret in your CI/CD pipeline OR in another dir. Do not commmit to repo
+----------------------------------------
+
+2. Now build your melange.yaml file and create the packages dir
+
+mkdir -p packages
+
+-----------------------------------------
+3. Run it
+
+docker run --privileged --rm -v "${PWD}:/work" \
+  cgr.dev/chainguard/melange:latest \
+  build melange.yaml \
+  --arch amd64 \
+  --signing-key melange.rsa
+
+
+
