@@ -22,7 +22,7 @@ contents:
     - glibc-locale-posix     # Locale support
     
     # Your application package
-    - dh-external-rag@local      # @local means it comes from ./packages
+    - fastapi-app@local      # @local means it comes from ./packages
 
 # Environment variables
 environment:

@@ -43,5 +43,21 @@ docker run --rm \
   --keyring-append melange.rsa.pub \
   --out-dir ./packages
 ------------------------------------------
+4. Now the apko...
 
+docker run --rm \
+    -v ${PWD}:/work \
+    -w /work \
+    cgr.dev/chainguard/apko \
+    build apko.yaml \
+    sample-fastapi:1.0.0 \
+    sample-fastapi.tar \
+    --arch x86_64
 
+--------------------------------------------
+5. Create docker image 
+
+docker load < sample-fastapi.tar
+
+--------------------------------------------
+6. then tag the resultant image to whatever you want.

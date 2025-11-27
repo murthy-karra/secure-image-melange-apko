@@ -2,3 +2,6 @@ venv/
 .venv/
 packages/
 melange.rsa
+sbom*
+scan_results.json
+*.tar
