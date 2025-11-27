@@ -10,7 +10,7 @@ contents:
   # Public keys for package verification
   keyring:
     - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub  # Wolfi's public key
-    - ./melange.rsa.pub                                    # Your public key
+    - build/melange.rsa.pub                                    # Your public key
   
   # Packages to install in the image
   packages:

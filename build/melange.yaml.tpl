@@ -5,8 +5,8 @@ package:
   version: 0.0.0
   # Specifies the version number of this package release
   annotations:
-    git_commit: "b4682e8"
-    git_dirty: "true"
+    git_commit: "__GIT_HASH__"
+    git_dirty: "__DIRTY__"
 
   epoch: 0
   # Epoch is used for package versioning conflicts - 0 means no special versioning override

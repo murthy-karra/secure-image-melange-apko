@@ -5,3 +5,4 @@ melange.rsa
 sbom*
 scan_results.json
 *.tar
+melange.yaml
