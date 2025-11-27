@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-app
+  namespace: rag
+  labels:
+    app: fastapi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-app
+  template:
+    metadata:
+      labels:
+        app: fastapi-app
+    spec:
+      containers:
+      - name: fastapi-app
+        image: fastapi-app-dev
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: ENV
+          value: "development"
+        - name: PYTHONPATH
+          value: "/app"
+        - name: LOG_LEVEL
+          value: "DEBUG"
+        - name: ENVIRONMENT
+          value: "development"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "16Gi"
+            cpu: "4000m"
+        # Enable interactive mode for debugging if needed
+        stdin: true
+        tty: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+  namespace: rag
+  labels:
+    app: fastapi-app
+spec:
+  selector:
+    app: fastapi-app
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+  type: ClusterIP

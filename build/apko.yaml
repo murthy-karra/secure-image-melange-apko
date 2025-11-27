@@ -1,61 +1,57 @@
-# apko.yaml - Configuration for building the final container image
-# This combines Wolfi base packages with your custom FastAPI package
-
 contents:
-  # Package repositories
   repositories:
-    - https://packages.wolfi.dev/os  # Wolfi's official packages
-    - ./packages                     # Your local packages (from Melange)
-  
-  # Public keys for package verification
+    - https://packages.wolfi.dev/os
+    - ./packages
   keyring:
-    - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub  # Wolfi's public key
-    - build/melange.rsa.pub                                    # Your public key
-  
-  # Packages to install in the image
-  packages:
-    # Minimal Wolfi base (just enough to run)
-    - wolfi-base              # Basic Linux utilities
-    - ca-certificates-bundle  # SSL/TLS certificates
-    - python-3.12-base        # Python runtime (no pip/dev tools)
-    - libstdc++              # C++ standard library (needed by Python)
-    - glibc-locale-posix     # Locale support
-    
-    # Your application package
-    - fastapi-app@local      # @local means it comes from ./packages
+    - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    - build/melange.rsa.pub
 
-# Environment variables
+  packages:
+    # --- The Distroless Base ---
+    # We DO NOT install wolfi-base (which contains busybox/shell)
+    - ca-certificates-bundle
+    - tzdata                 # Timezone data is often needed by logs
+    - glibc-locale-posix     # Minimal locale support
+    
+    # Minimal Python Runtime (No pip, no development tools)
+    - python-3.12-base
+    
+    # Your compiled application
+    - fastapi-app@local
+
 environment:
-  # Python paths
-  PATH: /app/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-  PYTHONUNBUFFERED: "1"           # Immediate output (good for containers)
-  PYTHONDONTWRITEBYTECODE: "1"    # Don't create .pyc files
-  PYTHONPATH: "/app"               # Where to find Python modules
+  # --- Runtime Path Configuration ---
+  # Since we don't have a shell to source "activate", we must 
+  # manually tell Python where the venv packages are.
   
-  # Application settings
-  ENVIRONMENT: "production"
+  # Point directly to the venv site-packages inside the container
+  PYTHONPATH: "/app/venv/lib/python3.12/site-packages:/app"
+  
+  # Add the venv bin to path (in case main.py calls subprocesses)
+  PATH: "/app/venv/bin:/usr/bin:/bin"
+  
+  # Python Optimizations
+  PYTHONUNBUFFERED: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+  
+  # App Configuration
   PORT: "8000"
   LOG_LEVEL: "info"
 
-# User configuration (non-root)
 accounts:
-  groups:
-    - groupname: appgroup
-      gid: 1001
+  run-as: "appuser"
   users:
     - username: appuser
       uid: 1001
       gid: 1001
-      homedir: /home/appuser
-      shell: /bin/false         # Minimal shell (could use /bin/false for no shell)
-  run-as: "appuser:appgroup"
+      shell: /bin/false # Redundant as there is no shell, but good practice
 
-# Container configuration
-work-dir: /app               # Working directory
+# --- The "No Shell" Entrypoint ---
+# We invoke the binary directly. 
+# There is no /bin/sh or /bin/bash in this image.
+# Corrected entrypoint for apko.yaml
 entrypoint:
-  command: /app/run.sh      # Script that starts your FastAPI app
+  command: /usr/bin/python3.12 -m uvicorn main:app --host 0.0.0.0 --port 8000
 
-# Architecture support
 archs:
-  - x86_64                  # Intel/AMD 64-bit
-  # - aarch64               # ARM64 (uncomment if needed)
+  - x86_64

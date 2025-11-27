@@ -16,7 +16,7 @@ fi
 sed \
   -e "s/__GIT_HASH__/$GIT_HASH/" \
   -e "s/__DIRTY__/$DIRTY/" \
-  build/melange.yaml.tpl > melange.yaml
+  build/melange.yaml > melange.yaml
 
 echo "Annotations set: commit=$GIT_HASH dirty=$DIRTY"
 
@@ -38,13 +38,15 @@ PKG=$(docker run --rm \
   -w /work \
   mikefarah/yq -r '.package.name' melange.yaml)
 
-echo "Package name: ${PKG}"
 
 if [ "$DIRTY" = "true" ]; then
   TAG="${GIT_HASH}-dirty"
 else
   TAG="${GIT_HASH}"
 fi
+
+echo "Package: ${PKG}:${TAG}"
+
 
 docker run --rm \
     -v ${PWD}:/work \

@@ -1,0 +1,81 @@
+# ============================================
+# Stage 1: Builder stage
+# ============================================
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
+
+# Install uv in builder
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Copy dependency files
+COPY pyproject.toml ./
+
+
+# Create virtual environment and install all Python dependencies
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+RUN uv venv && uv sync
+
+# ============================================
+# Stage 2: Runtime stage  
+# ============================================
+FROM python:3.12-slim
+
+# Install only essential runtime dependencies
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    # Essential tools
+    curl \
+    # Clean up
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
+
+# Set up working directory
+WORKDIR /app
+
+# Set Python environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    VIRTUAL_ENV=/app/.venv \
+    PATH="/app/.venv/bin:$PATH" \
+    # UV configuration
+    UV_SYSTEM_PYTHON=1
+
+# Copy uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Copy virtual environment from builder
+COPY --from=builder /app/.venv /app/.venv
+
+# Copy project files
+COPY pyproject.toml ./
+
+# Copy application source code
+COPY src/app /app/
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/temp \
+    && mkdir -p /app/uploads \
+    && mkdir -p /app/processed \
+    && mkdir -p /app/logs \
+    && chmod -R 755 /app
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Expose port
+EXPOSE 8000
+
+# Run with optimized settings
+CMD ["uv", "run", "uvicorn", "main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8000", \
+     "--reload", \
+     "--reload-dir", "/app", \
+     "--log-level", "info", \
+     "--loop", "uvloop", \
+     "--access-log"]

@@ -1,0 +1,40 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: fastapi-app-dev
+build:
+  local:
+    push: true  # Push to registry after building locally
+    useDockerCLI: true  # Use local Docker daemon
+  artifacts:
+  - image: fastapi-app-dev
+    context: .
+    docker:
+      dockerfile: Dockerfile.dev
+    sync:
+      manual:
+      - src: "src/app/**/*.py"
+        dest: "/app"
+        strip: "src/app/"
+      - src: "src/app/**/*.json"
+        dest: "/app"
+      - src: "src/app/**/*.yaml"
+        dest: "/app"
+      - src: "src/app/**/*.txt"
+        dest: "/app"
+      - src: "src/app/**/*.toml"
+        dest: "/app"
+      - src: "src/app/**/*.env"
+        dest: "/app"
+      
+
+manifests:
+  rawYaml:
+    - k8s/deployment-dev.yaml
+
+portForward:
+- resourceType: Service
+  resourceName: fastapi-service
+  port: 8000
+  localPort: 8001
+  address: localhost
