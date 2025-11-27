@@ -1,0 +1,6 @@
+apiVersion: v2
+name: fastapi-app
+description: A Helm chart for the FastAPI application
+type: application
+version: 0.1.0  # Config version (bump only if you change templates)
+appVersion: "1.0.0" # App version (documentation only)

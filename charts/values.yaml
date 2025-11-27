@@ -1,0 +1,36 @@
+# Default values for fastapi-app.
+
+replicaCount: 1
+
+image:
+  repository: nvcr.io/0641216746495070/shi-dh/fastapi-app
+  pullPolicy: Always
+  # Overridden by --set image.tag=... during deploy
+  tag: "c9275a4-dirty-amd64" 
+
+imagePullSecrets:
+  - name: ngc-secret
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "200m"
+  limits:
+    memory: "16Gi"
+    cpu: "4000m"
+
+# Environment variables
+env:
+  ENV: "development"
+  PYTHONPATH: "/app"
+  LOG_LEVEL: "DEBUG"
+  ENVIRONMENT: "development"
+
+# Debugging flags from your original file
+debug:
+  stdin: true
+  tty: true
