@@ -23,7 +23,7 @@ apko build \
 
 echo "==> Loading into Docker..."
 docker load < $TAR_OUT
-
+NEW_IMAGE_NAME="fastapi-app:latest-amd64"
 echo ""
 echo "==> DONE! Run:"
-echo "docker run -p 8080:8080 $IMAGE_NAME:latest"
+echo "docker run -p 8080:8080 $NEW_IMAGE_NAME"
