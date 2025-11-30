@@ -6,7 +6,7 @@ image:
   repository: nvcr.io/0641216746495070/shi-dh/fastapi-app
   pullPolicy: Always
   # Overridden by --set image.tag=... during deploy
-  tag: "f8c5fd8-dirty-amd64" 
+  tag: "latest-amd64" 
 
 imagePullSecrets:
   - name: ngc-secret

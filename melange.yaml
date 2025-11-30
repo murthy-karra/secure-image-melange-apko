@@ -35,12 +35,12 @@ pipeline:
 
   - name: Create destination directories
     runs: |
-      mkdir -p "${{targets.destdir}}/usr/lib/fastapi-app"
-      mkdir -p "${{targets.destdir}}/usr/lib/fastapi-app/meta"
+      mkdir -p "${{targets.destdir}}/usr/lib/${{package.name}}"
+      mkdir -p "${{targets.destdir}}/usr/lib/${{package.name}}/meta"
 
   - name: Copy git metadata
     runs: |
-      cp ${{targets.contextdir}}/metadata "${{targets.destdir}}/usr/lib/fastapi-app/meta/buildinfo"
+      cp ${{targets.contextdir}}/metadata "${{targets.destdir}}/usr/lib/${{package.name}}/meta/buildinfo"
 
   - name: Install Python dependencies from requirements.txt
     runs: |
@@ -49,4 +49,4 @@ pipeline:
 
   - name: Copy application source
     runs: |
-      cp -r ./src/* "${{targets.destdir}}/usr/lib/fastapi-app/"
+      cp -r ./src/* "${{targets.destdir}}/usr/lib/${{package.name}}/"
