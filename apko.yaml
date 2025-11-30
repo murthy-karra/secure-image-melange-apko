@@ -1,0 +1,32 @@
+contents:
+  repositories:
+    - https://packages.wolfi.dev/os
+    - "@local packages"
+  keyring:
+    - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    - melange.rsa.pub
+
+  packages:
+    - python-3.12
+    - ca-certificates
+    - fastapi-app@local
+
+accounts:
+  users:
+    - username: appuser
+      uid: 10001
+  groups:
+    - groupname: appuser
+      gid: 10001
+  run-as: appuser
+
+work-dir: "/usr/lib/fastapi-app"
+
+environment:
+  PYTHONUNBUFFERED: "1"
+  PYTHONPATH: "/usr/lib/fastapi-app"
+
+entrypoint:
+  command: |
+    uvicorn app.main:app --host 0.0.0.0 --port 8000
+

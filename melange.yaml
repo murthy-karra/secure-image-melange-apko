@@ -1,0 +1,52 @@
+package:
+  name: fastapi-app
+  version: 0.1.0
+  epoch: 0
+  description: "FastAPI application packaged using Melange"
+  copyright:
+    - license: MIT
+  annotations:
+    git_commit: "${{build.metadata.git_commit}}"
+    git_dirty: "${{build.metadata.git_dirty}}"
+    build_date: "${{build.metadata.date}}"
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - busybox              # For /bin/sh during build
+      - python-3.12          # Pinned versions
+      - python-3.12-dev
+      - py3.12-pip
+      - gcc
+      - glibc-dev
+      - linux-headers
+      - ca-certificates
+
+pipeline:
+  - name: Record git metadata
+    runs: |
+      echo "git_commit=$(git rev-parse HEAD 2>/dev/null || echo unknown)" >> ${{targets.contextdir}}/metadata
+      echo "git_dirty=$(git diff --quiet || echo dirty)" >> ${{targets.contextdir}}/metadata
+      echo "date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> ${{targets.contextdir}}/metadata
+
+  - name: Create destination directories
+    runs: |
+      mkdir -p "${{targets.destdir}}/usr/lib/fastapi-app"
+      mkdir -p "${{targets.destdir}}/usr/lib/fastapi-app/meta"
+
+  - name: Copy git metadata
+    runs: |
+      cp ${{targets.contextdir}}/metadata "${{targets.destdir}}/usr/lib/fastapi-app/meta/buildinfo"
+
+  - name: Install Python dependencies from requirements.txt
+    runs: |
+      pip install --upgrade pip
+      pip install --prefix="${{targets.destdir}}/usr" -r ./requirements.txt
+
+  - name: Copy application source
+    runs: |
+      cp -r ./src/* "${{targets.destdir}}/usr/lib/fastapi-app/"
